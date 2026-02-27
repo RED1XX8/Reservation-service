@@ -79,6 +79,7 @@ public class ReservationService {
         return mapper.toResponse(entityToNewStatus);
     }
 
+
     @Transactional
     public  ReservationResponse updateReservation(Long id, ReservationRequest reservationRequest) {
         var entityToUpdate = reservationRepository.findById(id)
