@@ -1,6 +1,5 @@
 package red1xx8.reservationservice.reservation;
 
-import jakarta.persistence.Id;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;

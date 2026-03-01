@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -14,11 +13,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import red1xx8.reservationservice.exception.InvalidTransactionalStatusException;
-import red1xx8.reservationservice.exception.ReservationConflictException;
 import red1xx8.reservationservice.table.TableRepository;
 import red1xx8.reservationservice.user.UserRepository;
 
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -49,19 +46,17 @@ public class ReservationService {
         entityToSave.setUser(user);
         entityToSave.setTable(table);
         entityToSave.setStatus(ReservationStatus.PENDING);
-        try{
-            reservationRepository.save(entityToSave);
-            log.info("Reservation created: id = {} , userId = {} , tableId = {} , start = {} , end = {}"
-                    ,entityToSave.getId()
-                    ,entityToSave.getUser().getId()
-                    ,entityToSave.getTable().getId()
-                    ,entityToSave.getStartReservation()
-                    ,entityToSave.getEndReservation());
-            return mapper.toResponse(entityToSave);
-        }
-        catch(DataIntegrityViolationException e){
-            throw new ReservationConflictException("This table already reserved");
-        }
+
+        reservationRepository.save(entityToSave);
+        log.info("Reservation created: id = {} , userId = {} , tableId = {} , start = {} , end = {}"
+                ,entityToSave.getId()
+                ,entityToSave.getUser().getId()
+                ,entityToSave.getTable().getId()
+                ,entityToSave.getStartReservation()
+                ,entityToSave.getEndReservation());
+
+        return mapper.toResponse(entityToSave);
+
     }
 
     @Transactional
@@ -101,23 +96,19 @@ public class ReservationService {
         entityToUpdate.setEvent(reservationRequest.event());
 
 
-        try{
-            log.info("Reservation updated: id = {} , userId = {} , tableId = {} , start = {} , end = {}"
-                    ,entityToUpdate.getId()
-                    ,entityToUpdate.getUser().getId()
-                    ,entityToUpdate.getTable().getId()
-                    ,entityToUpdate.getStartReservation()
-                    ,entityToUpdate.getEndReservation());
-            return mapper.toResponse(entityToUpdate);
+        log.info("Reservation updated: id = {} , userId = {} , tableId = {} , start = {} , end = {}"
+                ,entityToUpdate.getId()
+                ,entityToUpdate.getUser().getId()
+                ,entityToUpdate.getTable().getId()
+                ,entityToUpdate.getStartReservation()
+                ,entityToUpdate.getEndReservation());
+        return mapper.toResponse(entityToUpdate);
 
-        }
-        catch(DataIntegrityViolationException e){
-            throw new ReservationConflictException("This table already reserved");
-        }
+
     }
 
 
-    public Slice<ReservationResponse> searchByFilter(
+    public ReservationSliceDto searchByFilter(
             ReservationSearchFilter reservationSearchFilter,
             Pageable pageable
     ) {
@@ -154,9 +145,15 @@ public class ReservationService {
 
          SliceImpl<ReservationResponse> slice = new SliceImpl<>(content , pageable , hasNext );
 
+
         log.info("SearchByFilter returned {} reservations, hasNext={}", content.size(), slice.hasNext());
 
-        return slice;
+        return new ReservationSliceDto(
+                slice.getContent().stream().toList(),
+                slice.getNumber(),
+                slice.getSize(),
+                slice.hasNext()
+        );
 
     }
 }

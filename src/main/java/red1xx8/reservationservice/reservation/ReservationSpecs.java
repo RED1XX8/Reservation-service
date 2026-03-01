@@ -8,17 +8,17 @@ public class ReservationSpecs {
 
     public static Specification<ReservationEntity> hasReservationId(Long id){
         return (root , query , criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("id") , id);
+                id == null? criteriaBuilder.conjunction(): criteriaBuilder.equal(root.get("id") , id);
     }
 
     public static Specification<ReservationEntity> hasUserId(Long userId){
         return (root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("user").get("id") , userId);
+                userId == null? criteriaBuilder.conjunction(): criteriaBuilder.equal(root.get("user").get("id") , userId);
     }
 
     public static Specification<ReservationEntity> hasTableId(Long tableId){
         return (root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("table").get("id") , tableId);
+                tableId == null? criteriaBuilder.conjunction(): criteriaBuilder.equal(root.get("table").get("id") , tableId);
     }
 
     public static Specification<ReservationEntity> inRangeTime(LocalDateTime start , LocalDateTime end){
@@ -33,12 +33,12 @@ public class ReservationSpecs {
 
     public static Specification<ReservationEntity> hasEvent(Event event){
         return (root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("event") , event);
+                event == null? criteriaBuilder.conjunction(): criteriaBuilder.equal(root.get("event") , event);
     }
 
     public static Specification<ReservationEntity> hasStatus(ReservationStatus status){
         return (root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("status"), status);
+                status == null? criteriaBuilder.conjunction(): criteriaBuilder.equal(root.get("status"), status);
     }
 
 }
