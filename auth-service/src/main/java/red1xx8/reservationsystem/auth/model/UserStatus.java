@@ -1,0 +1,6 @@
+package red1xx8.reservationsystem.auth.model;
+
+public enum UserStatus {
+    BLOCKED,
+    ACTIVE
+}

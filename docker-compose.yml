@@ -1,18 +1,48 @@
-
 services:
-
-  reservation_db:
+  postgres:
     image: postgres:15-alpine
-    container_name: reservation_db_container
+    container_name: postgres_container
     environment:
-      POSTGRES_USER : ${RESERVATION_DB_USER}
-      POSTGRES_PASSWORD : ${RESERVATION_DB_PASSWORD}
-      POSTGRES_DB : ${RESERVATION_DB}
-
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
     volumes:
-      - reservation_db_data:/var/lib/postgresql/data
-
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     ports:
       - "5432:5432"
+
+  reservation-service:
+    build:
+      context: .
+      dockerfile: reservation-service/Dockerfile
+    image: red1xx8/reservation-service:latest
+    container_name: reservation_system_container
+    ports:
+      - 8082:8082
+    environment:
+      SPRING_DATASOURCE_URL: ${RESERVATION_DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${AUTH_DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${AUTH_DB_PASSWORD}
+    depends_on:
+      - postgres
+
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    image: red1xx8/auth-service:latest
+    container_name: auth_service_container
+    ports:
+      - 8081:8081
+    environment:
+      SPRING_DATASOURCE_URL: ${AUTH_DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${AUTH_DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${AUTH_DB_PASSWORD}
+    depends_on:
+      - postgres
+
 volumes:
-  reservation_db_data:
+  postgres_data:
+
+

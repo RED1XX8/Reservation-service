@@ -1,4 +1,0 @@
-
-
-ALTER TABLE users
-    ALTER COLUMN number_phone TYPE VARCHAR(15);

@@ -1,4 +1,0 @@
-ALTER TABLE users
-    ADD COLUMN password VARCHAR(255) NOT NULL,
-    ADD COLUMN role VARCHAR(50),
-    ADD COLUMN status VARCHAR(50);
